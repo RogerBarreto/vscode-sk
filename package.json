@@ -1,0 +1,201 @@
+{
+  "name": "semantickernel",
+  "displayName": "Semantic Kernel: Write and improve code using AI",
+  "description": "Extension that allows you to use OpeanAI compatible providers inside the IDE",
+  "version": "0.1.1",
+  "publisher": "rogerio-barreto",
+  "icon": "resources/extensionIcon.png",
+  "license": "MIT",
+  "repository": {
+    "url": "https://github.com/rogerio-barreto/vscode-sk"
+  },
+  "engines": {
+    "vscode": "^1.73.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "copilot",
+    "openai",
+    "chatgpt",
+    "azureopenai",
+    "productivity",
+    "semantickernel",
+    "ai",
+    "explain",
+    "find bugs",
+    "explain ",
+    "refactor"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "semanticKernel.codeAsk",
+        "title": "AI: Ask"
+      },
+      {
+        "command": "semanticKernel.codeExplain",
+        "title": "AI: Explain selection"
+      },
+      {
+        "command": "semanticKernel.codeRefactor",
+        "title": "AI: Refactor selection"
+      },
+      {
+        "command": "semanticKernel.codeProblem",
+        "title": "AI: Find problems"
+      },
+      {
+        "command": "semanticKernel.codeOptimize",
+        "title": "AI: Optimize selection"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "semanticKernel.codeAsk",
+          "when": "editorTextFocus",
+          "group": "semantickernel-menu-group@1"
+        },
+        {
+          "command": "semanticKernel.codeExplain",
+          "when": "editorHasSelection",
+          "group": "semantickernel-menu-group@2"
+        },
+        {
+          "command": "semanticKernel.codeRefactor",
+          "when": "editorHasSelection",
+          "group": "semantickernel-menu-group@3"
+        },
+        {
+          "command": "semanticKernel.codeProblem",
+          "when": "editorHasSelection",
+          "group": "semantickernel-menu-group@4"
+        },
+        {
+          "command": "semanticKernel.codeOptimize",
+          "when": "editorHasSelection",
+          "group": "semantickernel-menu-group@5"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "semanticKernel.codeAsk"
+        },
+        {
+          "command": "semanticKernel.codeExplain",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "semanticKernel.codeRefactor",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "semanticKernel.codeProblem",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "semanticKernel.codeOptimize",
+          "when": "editorHasSelection"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "semantickernel",
+          "title": "Semantic Kernel",
+          "icon": "resources/icon.png"
+        }
+      ]
+    },
+    "views": {
+      "semantickernel": [
+        {
+          "type": "webview",
+          "id": "semanticKernel.chatView",
+          "name": "Output"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Semantic Kernel",
+      "type": "object",
+      "properties": {
+        "semanticKernel.apiKey": {
+          "type": "string",
+          "description": "The API key to use for the OpenAI API",
+          "order": 1
+        },
+        "semanticKernel.deploymentOrModelId": {
+          "type": "string",
+          "default": "text-davinci-003",
+          "description": "OpenAI model name (text-davinci-003, curie, babbage)",
+          "order": 2
+        },
+        "semanticKernel.serviceUrl": {
+          "type": "string",
+          "default": "http://localhost:7071",
+          "description": "Semantic Kernel Backend API Url",
+          "order": 3
+        },
+        "semanticKernel.isOpenAI": {
+          "type": "boolean",
+          "default": true,
+          "description": "Leave it checked for ChatGPT",
+          "order": 4
+        },
+        "semanticKernel.azureOpenAiEndpoint": {
+          "type": "string",
+          "description": "When using Azure Open AI, specify the endpoint here (Leave blank if not)",
+          "order": 5
+        },
+        "semanticKernel.pasteOnClick": {
+          "type": "boolean",
+          "default": true,
+          "description": "Paste the code from a codeblock inside the response into the editor when you click on it",
+          "order": 6
+        },
+        "semanticKernel.selectedInsideCodeblock": {
+          "type": "boolean",
+          "default": true,
+          "description": "Append selected code as a codeblock (```...code...```) instead of plain text",
+          "order": 7
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "yarn run compile-tests && yarn run compile && yarn run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.0.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.73.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "@vscode/test-electron": "^2.2.0",
+    "eslint": "^8.28.0",
+    "glob": "^8.0.3",
+    "mocha": "^10.1.0",
+    "ts-loader": "^9.4.1",
+    "typescript": "^4.9.3",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.0"
+  },
+  "dependencies": {
+    "node-fetch": "^3.1.0"
+  }
+}
