@@ -1,11 +1,19 @@
 import * as vscode from 'vscode';
 import { IKeyConfig } from './models/KeyConfig';
 import { SemanticKernel } from './SemanticKernel';
-
+import * as fs from 'fs';
 
 export function activate(context: vscode.ExtensionContext) {
 	// Create a new SKViewProvider instance and register it with the extension's context
 	const provider = new SKViewProvider(context.extensionUri);
+	let fileContents: string = "";
+	let timerCopy: NodeJS.Timeout | undefined;
+	const copyToClipboard = () => {
+		vscode.env.clipboard.writeText(fileContents);
+		vscode.window.showInformationMessage(`Copied file contents to clipboard`);
+
+		fileContents = "";
+	}
 
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(SKViewProvider.viewType, provider,  {
@@ -17,6 +25,34 @@ export function activate(context: vscode.ExtensionContext) {
 	const skillFunctionHandler = (skillName: string, functionName: string) => {
 		provider.search("", skillName, functionName);
 	};
+
+	let disposable = vscode.commands.registerCommand('semanticKernel.copyFileContents', async (uri: vscode.Uri) => 
+	{
+		await vscode.commands.executeCommand('copyFilePath');
+       	let filesText = await vscode.env.clipboard.readText();  // returns a string
+		let files = filesText.split("\r\n");
+
+		let combinedContent = '';
+		try 
+		{	
+			for(let filePath of files) 
+			{
+				const fileContent = fs.readFileSync(filePath, 'utf8');
+				combinedContent += "File: " + filePath + '\n';
+				combinedContent += fileContent + '\n';
+
+				fileContents += combinedContent;
+			}
+		} 
+		catch (err) {
+			vscode.window.showErrorMessage(`Error copying file contents: ${err}`);
+		}
+
+		if (timerCopy) {
+			clearTimeout(timerCopy);
+		}
+		timerCopy = setTimeout(copyToClipboard, 2000);
+    });
 
 	const codeAsk = vscode.commands.registerCommand('semanticKernel.codeAsk', () => {
 		vscode.window.showInputBox({ prompt: 'What do you want to do?' }).then((value: string | undefined) => {
@@ -38,8 +74,11 @@ export function activate(context: vscode.ExtensionContext) {
 	const codeProblem = vscode.commands.registerCommand('semanticKernel.codeProblem', () => {
 		skillFunctionHandler("Code", "FindProblem");
 	});	
-
-	context.subscriptions.push(codeAsk, codeExplain, codeRefactor, codeOptimize, codeProblem);
+	const copyFiles = vscode.commands.registerCommand('extension.copyFileContents', (uri) => {
+		vscode.window.showInformationMessage(`Selected file: ${uri.fsPath}`);
+	});
+	
+	context.subscriptions.push(codeAsk, codeExplain, codeRefactor, codeOptimize, codeProblem, copyFiles);
 
 	// Change the extension's session token when configuration is changed
 	vscode.workspace.onDidChangeConfiguration((event: vscode.ConfigurationChangeEvent) => {

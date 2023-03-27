@@ -2,7 +2,7 @@
   "name": "semantickernel",
   "displayName": "Semantic Kernel: Write and improve code using AI",
   "description": "Extension that allows you to use OpeanAI compatible providers inside the IDE",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publisher": "rogerio-barreto",
   "icon": "resources/extensionIcon.png",
   "license": "MIT",
@@ -51,9 +51,22 @@
       {
         "command": "semanticKernel.codeOptimize",
         "title": "AI: Optimize selection"
-      }
+      },
+      {
+        "command": "semanticKernel.copyFileContents",
+        "title": "AI: Copy File Contents",
+        "category": "Explorer",
+        "when": "explorerResourceIsFile && explorerViewletVisible"
+    }
     ],
     "menus": {
+      "explorer/context": [
+        {
+            "command": "semanticKernel.copyFileContents",
+            "group": "navigation",
+            "when": "resourceScheme == 'file'"
+        }
+      ],
       "editor/context": [
         {
           "command": "semanticKernel.codeAsk",
